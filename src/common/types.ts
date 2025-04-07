@@ -5,6 +5,17 @@ interface todoItem{
 }
 
 interface todoProps{
-    toDo:todoItem[]
+    todoArray:todoItem[]
 }
-export type {todoItem,todoProps};
+
+
+interface taskItem{
+    taskId:number;
+    title:string;
+    completed:boolean
+}
+interface searchProps{
+    setSearchText:(value:string)=>void;
+    searchText:string;
+}
+export type {todoItem,todoProps,taskItem,searchProps};

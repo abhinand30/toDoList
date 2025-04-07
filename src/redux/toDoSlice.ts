@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { todoItem } from '../common/types'
 
 interface cartState{
@@ -10,27 +10,35 @@ interface cartState{
   }
 
 const todosSlice = createSlice({
-  name: 'todos',
+  name: 'todo',
   initialState,
   reducers: {
-    addTodo(state, action) {
-      state.push({
+   
+    addTodo:(state, action:PayloadAction<todoItem>)=> {
+      state.todos.push({
         id: action.payload.id,
         title: action.payload.title,
         item:action.payload.item
       })
     },
     taskCompleted(state,action){
-        const todo=state.find((todo)=>todo.id===action.payload.todoId);
-        const task= todo.find((item) => item.id === action.payload.itemId);
-        task.completed = !task.completed
+        const todo=state.todos.find((todo)=>todo.id===action.payload.todoId);
+        if(todo){
+          const task= todo.item.find((item) => item.taskId === action.payload.itemId);
+          if(task){
+            task.completed = !task.completed
+          }
+          
+        } 
+       
     },
 
-  deleteTodo(state,action){
-    state.todos.filter((todo)=>todo.id!==action.payload.todoItem);
+  deleteTodo:(state,action:PayloadAction<number>)=>{
+    state.todos.filter((todo)=>todo.id!==action.payload);
   },
 },
 })
 
-export const { addTodo, todoToggled } = todosSlice.actions
-export default todosSlice.reducer
+export const { addTodo, taskCompleted,deleteTodo } = todosSlice.actions;
+export const todoSelected = (state: {todo:cartState})=>state.todo.todos ;
+export default todosSlice.reducer;

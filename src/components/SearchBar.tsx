@@ -1,40 +1,45 @@
 import { Button, ListGroup, Modal } from 'react-bootstrap'
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import searchIcon from '../assets/searchIcon.png'
 import deleteIcon from '../assets/deleteIcon.png'
+import { addTodo, todoSelected } from '../redux/toDoSlice';
+import { searchProps } from '../common/types';
 
-interface searchProps{
-    setToDo:(value:string)=>void
-}
 const SearchBar:React.FC<searchProps>=(props)=> {
-    const {setToDo}=props;
+    const {setSearchText,searchText}=props;
+    const dispatch=useDispatch();
+    const todos=useSelector(todoSelected);
+
     const [isVisible, setIsVisible] = useState(false);
     const [title,setTitle]=useState<string>('');
     const [text,setText]=useState<string>('');
     const [tasks,setTasks]=useState<[]>([]);
     
-    // const [searchText,setSearchText]=useState<string>('')
 
     const handleToDo = () => {
-        setToDo((prevState)=>([...prevState,{id:1,title:title,item:tasks}]))
+        dispatch(addTodo({id:todos.length+1,title:title,item:tasks}))
         setIsVisible(!isVisible);
        setTitle('')
        setTasks([]);
     }
+
     const handleTask=()=>{
         if(text){
-            setTasks((prevState)=>([...prevState,{taskId:1,task:text,completed:false}]));
+            setTasks((prevState)=>([...prevState,{taskId:tasks.length+1,task:text,completed:false}]));
             setText('')
-        }
-       
-        
+        }  
     }
+
+    
+    
+    
     return (
         <div className='searchContainer'>
             <div className='searchBar'>
                 <img src={searchIcon} alt='search' className='logo' />
-                <input placeholder='Search Here' className='searchInput' />
+                <input placeholder='Search Here' className='searchInput' value={searchText} onChange={(e)=>setSearchText(e.target.value)}/>
             </div>
             <div>
                 <button className='buttonContainer' onClick={() => setIsVisible(!isVisible)}>+ Add New Task</button>
