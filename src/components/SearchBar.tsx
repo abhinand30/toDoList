@@ -1,11 +1,13 @@
-import { Button, ListGroup, Modal } from 'react-bootstrap'
+import { Button, Image, ListGroup, Modal } from 'react-bootstrap'
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import searchIcon from '../assets/searchIcon.png'
-import deleteIcon from '../assets/deleteIcon.png'
+import deleteIcon from '../assets/deleteIcon1.png'
 import { addTodo, todoSelected } from '../redux/toDoSlice';
 import { searchProps } from '../common/types';
+import { addDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 const SearchBar:React.FC<searchProps>=(props)=> {
     const {setSearchText,searchText}=props;
@@ -18,11 +20,22 @@ const SearchBar:React.FC<searchProps>=(props)=> {
     const [tasks,setTasks]=useState<[]>([]);
     
 
-    const handleToDo = () => {
-        dispatch(addTodo({id:todos.length+1,title:title,item:tasks}))
-        setIsVisible(!isVisible);
-       setTitle('')
-       setTasks([]);
+    const handleToDo = async() => {
+        // if(title){
+        //     dispatch(addTodo({id:todos.length+1,title:title,item:tasks}))
+        //     setIsVisible(!isVisible);
+        //     setTitle('');
+        //     setTasks([]);
+        //     setText('');
+        // }
+        try{
+             await addDoc(doc(db, "cities", "new-city-id"), data);
+        }
+        catch(error){
+            console.log(error)
+        }
+        
+       
     }
 
     const handleTask=()=>{
@@ -33,20 +46,24 @@ const SearchBar:React.FC<searchProps>=(props)=> {
     }
 
     
-    
+    const deleteTask=(id:number)=>{
+        const updatedTask=tasks.filter((task)=>task.taskId!==id)
+        setTasks(updatedTask)
+        
+    }
     
     return (
         <div className='searchContainer'>
             <div className='searchBar'>
-                <img src={searchIcon} alt='search' className='logo' />
+                <Image src={searchIcon} alt='search' className='logo' style={{}}/>
                 <input placeholder='Search Here' className='searchInput' value={searchText} onChange={(e)=>setSearchText(e.target.value)}/>
             </div>
             <div>
-                <button className='buttonContainer' onClick={() => setIsVisible(!isVisible)}>+ Add New Task</button>
-                <button className='buttonContainer'><img src={deleteIcon}></img></button>
+                <Button className='buttonContainer' onClick={() => setIsVisible(!isVisible)}>+ Add New Task</Button>
+                {/* <button className='buttonContainer'><img src={deleteIcon}></img></button> */}
             </div>
 
-            <Modal show={isVisible} onHide={handleToDo}>
+            <Modal show={isVisible} onHide={()=>setIsVisible(!isVisible)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Add ToDo</Modal.Title>
                 </Modal.Header>
@@ -57,9 +74,16 @@ const SearchBar:React.FC<searchProps>=(props)=> {
                     <Button onClick={handleTask}>+</Button>
                 </div>
                 {tasks&&(
-                    <ListGroup className='mt-10'>
+                    <ListGroup className='mt-10' style={{}}>
                         {tasks.map((task,index)=>(
-                            <ListGroup.Item key={index}>{task.task}</ListGroup.Item>
+                            <ListGroup.Item key={index} className='listComponent'>
+                                <div>
+                                {task.task}
+                                </div>
+                                <button className='deleteButton' onClick={()=>deleteTask(task.taskId)}>
+                                    <Image src={deleteIcon} alt='icon' className='logo'/>
+                                </button>
+                            </ListGroup.Item>
                         ))}
                         
                     </ListGroup>

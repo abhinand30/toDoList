@@ -1,101 +1,106 @@
-import { Button, Card, Dropdown, Form, Modal } from "react-bootstrap";
+import {  Button, Card, Image,Modal,Row } from "react-bootstrap";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 
 import { todoItem, todoProps } from "../common/types";
-import { deleteTodo, taskCompleted } from "../redux/toDoSlice";
-import menuIcon from '../assets/menuIcon.png'
+import { deleteTask, deleteTodo, taskCompleted } from "../redux/toDoSlice";
+import editIcon from '../assets/editIcon.png'
+import deleteIcon from "../assets/deleteIcon.png"
+import ModalComponent from "./ModalComponent";
 
 const ToDoComponent: React.FC<todoProps> = (props) => {
   const { todoArray } = props;
   const dispatch = useDispatch();
   const [modal, setModal] = useState<boolean>(false);
   const [todo, setTodo] = useState<todoItem | null>(null);
-  
+  const [deleteAlert,setDeleteAlert]=useState<boolean>(false);
+
   const handleTodo = (item: todoItem) => {
     setTodo(item);
     setModal(true);
   };
-  
 
-  const handleTask = (taskId:number) => {
-    if(todo){
-      dispatch(taskCompleted({todoId: todo.id, itemId:taskId }))
+
+  const handleTask = (taskId: number) => {
+    if (todo) {
+      dispatch(taskCompleted({ todoId: todo.id, itemId: taskId }));
+      setTodo({
+        ...todo,
+        item: todo.item.map((task) =>
+          task.taskId === taskId
+            ? { ...task, completed: !task.completed }
+            : task
+        ),
+      });
     }
-  }
-  
-  const handleDelete=(todoItem:number)=>{
-    console.log(todoItem,'jjjj')
-      dispatch(deleteTodo(todoItem))
-  }
-  
+  };
+
+  const handleDelete = (todoItem: number) => {
+    dispatch(deleteTodo(todoItem));
+    
+  };
+
+  const onDeleteTask = (taskId: number) => {
+        
+    if (taskId) {
+        dispatch(deleteTask({ todoId: todo?.id, taskId: taskId }));
+        if(todo){
+          setTodo({
+            ...todo,
+            item: todo.item.filter((task) =>
+              task.taskId !== taskId
+            ),
+          });
+        }
+       
+    }
+}
+
   return (
-    <div>
-      <div style={{ display: "flex",margin:'10px'  }}>
-      {todoArray.map((item, index) => (
-        <Card key={index} style={{ width: "18rem",borderColor:'10px',margin:'10px' }}>
-           <Card.Title style={{fontSize:'25px',fontWeight:'bold'}}>{item.title}
-           <Dropdown>
-      <Dropdown.Toggle variant="success" id="dropdown-basic" style={{backgroundColor:'#fff',borderWidth:0}}>
-        <img src={menuIcon}/>
-      </Dropdown.Toggle>
-
-      <Dropdown.Menu>
-        <Dropdown.Item onClick={() => handleTodo(item)}>Edit</Dropdown.Item>
-        <Dropdown.Item onClick={()=>handleDelete(item.id)}>Delete</Dropdown.Item>
-      </Dropdown.Menu>
-    </Dropdown>
-            </Card.Title>  
-          <Card.Body>
-           
-            <Card.Text>
-              {item.item.map((task, taskIndex) => (
-                <li key={taskIndex}>{task.task}</li>
-              ))}
-            </Card.Text>
-          </Card.Body>
-        </Card>
-      ))}
+    <div className="" style={{padding:'20px'}}>
+      <div className="todoTitle">
+        All Todos
       </div>
-     
+      <Row>
+        {todoArray.map((item, index) => (
+          <Card
+            key={index}
+            className="cardContianer"
+          >
+           
+            <Card.Body>
+            <button className='cardTitle'>
+              {item.title}
 
-      <Modal show={modal} onHide={() => setModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>{todo?.title || "No Title"}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {todo?.item?.filter((task)=>!task.completed).map((task, index) => (
-            <div key={index} className="rowContainer">
-              <Form.Check
-                type="checkbox"
-                id={`${task.taskId}`}
-                label={` ${task.task}`}
-                checked={task.completed}
-                onChange={() => handleTask(task.taskId)}
-              />
-            </div>
-          ))}
-          <hr />
-          {todo?.item?.filter((task)=>task.completed).map((task, index) => (
-            <div key={index} className="rowContainer">
-              <Form.Check
-                type="checkbox"
-                id={`${task.taskId}`}
-                label={` ${task.task}`}
-                checked={task.completed}
-                style={{textDecoration:'strike-through',color:'red'}}
-                onChange={() => handleTask(task.taskId)}
-              />
-            </div>
-          ))}
-          
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+            </button>  
+              <Card.Text>
+                {item.item.slice(0,3).map((task, taskIndex) => (
+                  <li key={taskIndex}>{task.task}</li>
+                ))}
+              </Card.Text>
+              <div style={{ display: "flex", bottom: '10px', position: 'absolute', right: '20px' }}>
+                <button className='deleteButton' onClick={() => handleTodo(item)}><Image src={editIcon} className='logo' /></button>
+                <button className='deleteButton' onClick={() => handleDelete(item.id)}><Image src={deleteIcon} className="logo" /></button>
+              </div>
+            </Card.Body>
+          </Card>
+        ))}
+      </Row>
+        <ModalComponent modal={modal} setModal={setModal} todo={todo} handleTask={handleTask} onDeleteTask={onDeleteTask}/>
+        
+        <Modal show={deleteAlert} onHide={()=>setDeleteAlert(!deleteAlert)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Add ToDo</Modal.Title>
+                </Modal.Header>
+          <Modal.Footer>
+                <Button variant="secondary" onClick={() => setDeleteAlert(false)}>
+                    Close
+                </Button>
+                <Button variant="" onClick={() => setModal(false)}>
+                    Close
+                </Button>
+                </Modal.Footer>
+        </Modal>
     </div>
   );
 };

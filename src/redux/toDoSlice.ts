@@ -29,16 +29,20 @@ const todosSlice = createSlice({
             task.completed = !task.completed
           }
           
-        } 
-       
+        }   
     },
-
+    deleteTask(state,action){
+      const todo=state.todos.find((todo)=>todo.id===action.payload.todoId);
+      if(todo){
+        todo.item= todo.item.filter((todo)=>todo.taskId!==action.payload.taskId)
+      }
+    },
   deleteTodo:(state,action:PayloadAction<number>)=>{
-    state.todos.filter((todo)=>todo.id!==action.payload);
+    state.todos=state.todos.filter((todo)=>todo.id!==action.payload);
   },
 },
 })
 
-export const { addTodo, taskCompleted,deleteTodo } = todosSlice.actions;
+export const { addTodo, taskCompleted,deleteTodo,deleteTask } = todosSlice.actions;
 export const todoSelected = (state: {todo:cartState})=>state.todo.todos ;
 export default todosSlice.reducer;

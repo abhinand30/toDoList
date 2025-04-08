@@ -14,8 +14,27 @@ interface taskItem{
     title:string;
     completed:boolean
 }
+interface taskState{
+    item:taskItem[]
+}
 interface searchProps{
-    setSearchText:(value:string)=>void;
+    setSearchText:(value: string) => void;
     searchText:string;
 }
-export type {todoItem,todoProps,taskItem,searchProps};
+
+interface modalProps{
+    modal:boolean;
+    setModal:(modal: boolean) => void;
+    todo:todoItem|null;
+    handleTask:(taskId: number) => void;
+    onDeleteTask:(taskId: number) => void;
+}
+
+interface todoState{
+    id:string;
+    date:{nanoseconds:number;seconds: number};
+    title:string;
+    description:string;
+    status:string
+}
+export type {todoItem,todoProps,taskItem,searchProps,taskState,modalProps,todoState};
