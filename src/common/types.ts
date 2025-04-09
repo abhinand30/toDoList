@@ -1,14 +1,20 @@
-interface todoItem{
-    id: number;
-    title:string;
-    item: {taskId:number;task:string;completed: boolean;}[],
-}
+// interface todoItem{
+//     id: number;
+//     title:string;
+//     item: {taskId:number;task:string;completed: boolean;}[],
+// }
 
+
+interface todoItem{
+    id:string;
+    date:{nanoseconds:number;seconds: number};
+    title:string;
+    description:string;
+    status:string
+}
 interface todoProps{
     todoArray:todoItem[]
 }
-
-
 interface taskItem{
     taskId:number;
     title:string;
@@ -22,19 +28,20 @@ interface searchProps{
     searchText:string;
 }
 
-interface modalProps{
-    modal:boolean;
-    setModal:(modal: boolean) => void;
-    todo:todoItem|null;
-    handleTask:(taskId: number) => void;
-    onDeleteTask:(taskId: number) => void;
-}
+// interface modalProps{
+//     modal:boolean;
+//     setModal:(modal: boolean) => void;
+//     todo:todoItem|null;
+//     handleTask:(taskId: number) => void;
+//     onDeleteTask:(taskId: number) => void;
+// }
+
 
 interface todoState{
-    id:string;
-    date:{nanoseconds:number;seconds: number};
-    title:string;
-    description:string;
-    status:string
-}
-export type {todoItem,todoProps,taskItem,searchProps,taskState,modalProps,todoState};
+    [key: string]: any;
+    title: string;
+    description: string;
+    status: string;
+    date: Date|null;
+  }
+export type {todoItem,taskItem,searchProps,taskState,todoState,todoProps};

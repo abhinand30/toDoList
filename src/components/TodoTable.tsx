@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Image, Table } from 'react-bootstrap'
+import { Button, Image, Table } from 'react-bootstrap'
 import { db } from '../firebase';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
@@ -7,18 +7,20 @@ import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
 
 import editIcon from '../assets/editIcon.png';
 import deleteIcon from '../assets/deleteIcon.png'
-import { todoState } from '../common/types';
+import { todoItem } from '../common/types';
 
 function TodoTable() {
   const navigate = useNavigate();
-
-  const [todoData, setTodoData] = useState<todoState[]>([]);
-  const [currentTime, setCurrentTime] = useState(moment().unix());
+  const currentTime=moment().unix()
+  
+  const [todoData, setTodoData] = useState<todoItem[]>([]);
   const [update, setUpdate] = useState<boolean>(false);
+
+  
   useEffect(() => {
     const handleData = async () => {
       try {
-        const todos: todoState[] = []
+        const todos: todoItem[] = []
         const querySnapshot = await getDocs(collection(db, "todo"));
         querySnapshot.forEach((doc) => {
           todos.push({ ...doc.data(), id: doc.id });
@@ -34,20 +36,25 @@ function TodoTable() {
 
 
   const handleDelete = async (id: string) => {
+    const confirmed = window.confirm('Are you want to delete todo?');
+    if (!confirmed) return;
+  
     try {
       await deleteDoc(doc(db, "todo", id));
-      setUpdate(true)
-      alert('Deleted successfully')
+      setUpdate(prev => !prev);
+      
+      alert('Deleted successfully');
     } catch (error) {
-      console.log(error)
-      alert('Error While Deeleting data')
+      console.log(error);
+      alert('Error while deleting data');
     }
-  }
-
-  const onNavigate = (todo: todoState) => {
-    navigate("/add-todo", { todo: { todo } });
   };
   
+  const onNavigate = (todo: todoItem) => {
+    navigate("/add-todo", { state: todo }); 
+  };
+  
+  console.log(todoData,'lll')
 
   return (
     <div>
@@ -67,18 +74,21 @@ function TodoTable() {
               <td>{todo.id}</td>
               <td>{todo.title}</td>
               <td>{todo.date ? moment.unix(todo.date.seconds).format("dddd, Do MMMM YYYY, h:mm A") : "Invalid Date"}</td>
-
-              <td>{todo.status}</td>
+              <td>{todo.date.seconds > currentTime ?todo.status:'Completed'}</td>
               <td>
 
-                {todo.date.seconds > currentTime ? (
-                  <button className='Button' onClick={() =>onNavigate(todo) }>
-                    <Image src={editIcon} className='logo' />
-                  </button>
+                {todo.date.seconds < currentTime||todo.status==='Completed' ? (
+                 <>
+                 </>
                 ) : (
-                  <button className='Button' onClick={() => handleDelete(todo.id)}>
-                    <Image src={deleteIcon} className='logo' />
-                  </button>
+                  <>
+                   <Button className='Button' onClick={() =>onNavigate(todo) }>
+                   <Image src={editIcon} className='logo' />
+                 </Button>
+                  <Button className='Button' onClick={() => handleDelete(todo.id)}>
+                  <Image src={deleteIcon} className='logo' />
+                </Button>
+                </>
                 )}
               </td>
             </tr>
