@@ -31,7 +31,7 @@ function AddTodoPage() {
 
 
   const handleDateChange = (selectedDate: Date | null) => {
-    console.log(selectedDate,'>>>')
+    
     if (selectedDate) {
       setDate(selectedDate);
       setFormData({ ...formData, date: selectedDate });
@@ -60,7 +60,6 @@ function AddTodoPage() {
       setLoading(true);
   
       if (todo?.id) {
-    
         const todoRef = doc(db, "todo", todo.id);
         await updateDoc(todoRef, {
           title: formData.title,
@@ -70,7 +69,7 @@ function AddTodoPage() {
         });
         alert("Todo successfully updated");
       } else {
-        
+
         await addDoc(collection(db, "todo"), {
           title: formData.title,
           description: formData.description,

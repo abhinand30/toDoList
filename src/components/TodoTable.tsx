@@ -11,12 +11,12 @@ import { todoItem } from '../common/types';
 
 function TodoTable() {
   const navigate = useNavigate();
-  const currentTime=moment().unix()
-  
+  const currentTime = moment().unix()
+
   const [todoData, setTodoData] = useState<todoItem[]>([]);
   const [update, setUpdate] = useState<boolean>(false);
 
-  
+
   useEffect(() => {
     const handleData = async () => {
       try {
@@ -38,23 +38,23 @@ function TodoTable() {
   const handleDelete = async (id: string) => {
     const confirmed = window.confirm('Are you want to delete todo?');
     if (!confirmed) return;
-  
+
     try {
       await deleteDoc(doc(db, "todo", id));
       setUpdate(prev => !prev);
-      
+
       alert('Deleted successfully');
     } catch (error) {
       console.log(error);
       alert('Error while deleting data');
     }
   };
-  
+
   const onNavigate = (todo: todoItem) => {
-    navigate("/add-todo", { state: todo }); 
+    navigate("/add-todo", { state: todo });
   };
+
   
-  console.log(todoData,'lll')
 
   return (
     <div>
@@ -69,26 +69,23 @@ function TodoTable() {
           </tr>
         </thead>
         <tbody>
+
           {todoData.map((todo) => (
             <tr key={todo.id}>
               <td>{todo.id}</td>
               <td>{todo.title}</td>
               <td>{todo.date ? moment.unix(todo.date.seconds).format("dddd, Do MMMM YYYY, h:mm A") : "Invalid Date"}</td>
-              <td>{todo.date.seconds > currentTime ?todo.status:'Completed'}</td>
+              <td>{todo.date.seconds > currentTime ? todo.status : 'Completed'}</td>
               <td>
-
-                {todo.date.seconds < currentTime||todo.status==='Completed' ? (
-                 <>
-                 </>
-                ) : (
+                {todo.date.seconds < currentTime || todo.status === 'In Progress' && (
                   <>
-                   <Button className='Button' onClick={() =>onNavigate(todo) }>
-                   <Image src={editIcon} className='logo' />
-                 </Button>
-                  <Button className='Button' onClick={() => handleDelete(todo.id)}>
-                  <Image src={deleteIcon} className='logo' />
-                </Button>
-                </>
+                    <Button className='Button' onClick={() => onNavigate(todo)}>
+                      <Image src={editIcon} className='logo' />
+                    </Button>
+                    <Button className='Button' onClick={() => handleDelete(todo.id)}>
+                      <Image src={deleteIcon} className='logo' />
+                    </Button>
+                  </>
                 )}
               </td>
             </tr>
